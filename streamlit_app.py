@@ -37,16 +37,22 @@ st.markdown("""
 
 # Initialize Groq client
 def get_groq_client():
-    api_key = st.secrets.get("GROQ_API_KEY", os.getenv("GROQ_API_KEY"))
+    try:
+        api_key = st.secrets["GROQ_API_KEY"]
+    except:
+        api_key = os.getenv("GROQ_API_KEY")
+    
     if not api_key:
-        st.error("GROQ_API_KEY not found. Please add it in Streamlit secrets.")
+        st.error("⚠️ GROQ_API_KEY not found! Please add it in Streamlit Cloud: Settings → Secrets")
+        st.code('GROQ_API_KEY = "your_key_here"')
         st.stop()
     return Groq(api_key=api_key)
 
 try:
     client = get_groq_client()
 except Exception as e:
-    st.error(f"Error initializing Groq client. Please check your API key.")
+    st.error(f"❌ Error: {str(e)}")
+    st.info("Make sure you added GROQ_API_KEY in Streamlit secrets (⚙️ Settings → Secrets)")
     st.stop()
 
 # Travel keywords
