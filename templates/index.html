@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Agent Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="plane">✈️</div>
+    <div class="plane plane2">✈️</div>
+    
+    <div class="page-container">
+        <!-- Left Section - Landing Page -->
+        <div class="landing-section">
+            <div class="landing-content">
+                <div class="icon">✈️🌍</div>
+                <h1>Hey! I'm Your Travel Agent Helper</h1>
+                <p>Ready to plan your next adventure? I'm here to help with flights, hotels, destinations, and all your travel needs!</p>
+                <div class="features">
+                    <div class="feature">🏨 Hotels</div>
+                    <div class="feature">✈️ Flights</div>
+                    <div class="feature">🗺️ Destinations</div>
+                    <div class="feature">🎫 Bookings</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section - Chatbot -->
+        <div class="chat-section">
+            <div class="chat-header">
+                <h2>💬 Chat with Travel Agent</h2>
+            </div>
+            
+            <div id="chatWindow" class="chat-window">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        Hi there! 👋 I'm your travel assistant. Ask me about destinations, flights, hotels, or any travel plans!
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Type your travel question..." />
+                <button id="sendBtn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatWindow = document.getElementById('chatWindow');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Send message
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Display user message
+            addMessage(message, 'user');
+            userInput.value = '';
+
+            // Show typing indicator
+            const typingDiv = addTypingIndicator();
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+                
+                // Remove typing indicator
+                typingDiv.remove();
+
+                // Display bot response
+                if (data.response) {
+                    addMessage(data.response, 'bot');
+                } else if (data.error) {
+                    addMessage('Sorry, something went wrong. Please try again.', 'bot');
+                }
+            } catch (error) {
+                typingDiv.remove();
+                addMessage('Sorry, I couldn\'t connect. Please try again.', 'bot');
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
+            chatWindow.appendChild(messageDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function addTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message typing';
+            typingDiv.innerHTML = '<div class="message-content"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+            chatWindow.appendChild(typingDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            return typingDiv;
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
