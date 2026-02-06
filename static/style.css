@@ -104,14 +104,14 @@ body::after {
 }
 
 .landing-content h1 {
-    font-size: 2.5em;
+    font-size: 3em;
     color: #1e3a8a;
     margin-bottom: 20px;
     text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
 }
 
 .landing-content p {
-    font-size: 1.2em;
+    font-size: 1.4em;
     color: #334155;
     margin-bottom: 30px;
     line-height: 1.6;
@@ -124,11 +124,30 @@ body::after {
     margin-top: 30px;
 }
 
+.chatbot-btn {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    color: white;
+    padding: 18px;
+    border-radius: 15px;
+    font-size: 1.4em;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: none;
+}
+
+.chatbot-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+}
+
 .feature {
     background: white;
     padding: 15px;
     border-radius: 15px;
-    font-size: 1.1em;
+    font-size: 1.3em;
     color: #1e3a8a;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
@@ -141,10 +160,14 @@ body::after {
 /* Chat Section - Right Side */
 .chat-section {
     flex: 1;
-    display: flex;
+    display: none;
     flex-direction: column;
     background: white;
     box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.chat-section.active {
+    display: flex;
 }
 
 .chat-header {
@@ -157,7 +180,7 @@ body::after {
 
 .chat-header h2 {
     margin: 0;
-    font-size: 1.8em;
+    font-size: 2em;
 }
 
 .chat-window {
@@ -183,9 +206,10 @@ body::after {
 
 .message-content {
     max-width: 70%;
-    padding: 12px 18px;
+    padding: 14px 20px;
     border-radius: 18px;
-    line-height: 1.5;
+    line-height: 1.6;
+    font-size: 1.1em;
 }
 
 .user-message .message-content {
@@ -245,10 +269,10 @@ body::after {
 
 #userInput {
     flex: 1;
-    padding: 12px 18px;
+    padding: 14px 20px;
     border: 2px solid #cbd5e1;
     border-radius: 25px;
-    font-size: 1em;
+    font-size: 1.1em;
     outline: none;
     transition: border-color 0.3s;
 }
@@ -258,13 +282,13 @@ body::after {
 }
 
 #sendBtn {
-    padding: 12px 30px;
+    padding: 14px 35px;
     background: #3b82f6;
     color: white;
     border: none;
     border-radius: 25px;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 1.1em;
     transition: background 0.3s;
 }
 

@@ -22,6 +22,7 @@
                     <div class="feature">✈️ Flights</div>
                     <div class="feature">🗺️ Destinations</div>
                     <div class="feature">🎫 Bookings</div>
+                    <button class="chatbot-btn" onclick="openChatbot()">💬 Open Chatbot</button>
                 </div>
             </div>
         </div>
@@ -51,6 +52,14 @@
         const chatWindow = document.getElementById('chatWindow');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
+        const chatSection = document.querySelector('.chat-section');
+        const landingSection = document.querySelector('.landing-section');
+
+        function openChatbot() {
+            landingSection.style.display = 'none';
+            chatSection.classList.add('active');
+            userInput.focus();
+        }
 
         // Send message
         async function sendMessage() {
