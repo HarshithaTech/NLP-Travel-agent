@@ -30,7 +30,10 @@
         <!-- Right Section - Chatbot -->
         <div class="chat-section">
             <div class="chat-header">
-                <h2>💬 Chat with Travel Agent</h2>
+                <div class="chat-header-left">
+                    <h2>💬 Chat with Travel Agent</h2>
+                </div>
+                <button class="new-session-btn" onclick="newSession()">🆕 New Session</button>
             </div>
             
             <div id="chatWindow" class="chat-window">
@@ -58,6 +61,19 @@
         function openChatbot() {
             landingSection.style.display = 'none';
             chatSection.classList.add('active');
+            userInput.focus();
+        }
+
+        function newSession() {
+            // Clear chat window except first bot message
+            chatWindow.innerHTML = `
+                <div class="message bot-message">
+                    <div class="message-content">
+                        Hi there! 👋 I'm your travel assistant. Ask me about destinations, flights, hotels, or any travel plans!
+                    </div>
+                </div>
+            `;
+            userInput.value = '';
             userInput.focus();
         }
 
