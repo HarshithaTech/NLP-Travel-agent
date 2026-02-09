@@ -7,9 +7,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-here')
 
 # Configure Groq API
 client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+
+# Store conversation history (in production, use database)
+conversation_history = {}
 
 # Load system prompt
 def load_system_prompt():
@@ -109,7 +113,7 @@ TRAVEL_KEYWORDS = [
 ]
 
 # Greeting keywords
-GREETING_KEYWORDS = ['hi', 'hello', 'hey', 'hye', 'hii', 'helo', 'greetings']
+GREETING_KEYWORDS = ['hi', 'hello', 'hey', 'hye', 'hii', 'helo', 'greetings', 'Hey there']
 
 def is_greeting(message):
     """Check if message is a greeting"""
@@ -163,15 +167,21 @@ def home():
 def chat():
     try:
         user_message = request.json.get('message', '')
+        session_id = request.json.get('session_id', 'default')
         
         if not user_message:
             return jsonify({'error': 'No message provided'}), 400
         
+        # Initialize conversation history for new sessions
+        if session_id not in conversation_history:
+            conversation_history[session_id] = []
+        
         # Check if message is a greeting
         if is_greeting(user_message):
-            return jsonify({
-                'response': "Hello! 👋 I'm your travel assistant. How can I help you plan your next adventure? Ask me about flights, hotels, destinations, or any travel plans! ✈️🌍"
-            })
+            response = "Hello! 👋 I'm your travel assistant. How can I help you plan your next adventure? Ask me about flights, hotels, destinations, or any travel plans! ✈️🌍"
+            conversation_history[session_id].append({"role": "user", "content": user_message})
+            conversation_history[session_id].append({"role": "assistant", "content": response})
+            return jsonify({'response': response})
         
         # Check if message is travel-related
         if not is_travel_related(user_message):
@@ -179,24 +189,30 @@ def chat():
                 'response': "Sorry! I'm a travel assistant and can only help with travel-related questions. 🌍✈️"
             })
         
+        # Add user message to history
+        conversation_history[session_id].append({"role": "user", "content": user_message})
+        
+        # Build messages with history (keep last 10 messages)
+        messages = [
+            {
+                "role": "system",
+                "content": "You are a helpful multilingual travel agent. Respond in the SAME LANGUAGE the user writes in (English, Hindi, Spanish, French, German, Japanese, etc.). ALWAYS format responses with clear structure:\n\n1. Use **bold headings** for sections\n2. Each point on a NEW LINE\n3. Use bullet points (•) or numbers\n4. Add line breaks between sections\n\nExample format:\n**📍 Day 1: Arrival**\n• Activity 1\n• Activity 2\n• Cost: ₹X\n\n**🏨 Hotels:**\n• Hotel Name - ₹X/night\n• Features\n\n**💰 Budget:**\n• Item: ₹X\n• Total: ₹X\n\nRemember previous conversation context and budget. IMPORTANT: Always reply in the user's language."
+            }
+        ] + conversation_history[session_id][-10:]
+        
         # Create chat completion with Groq
         chat_completion = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a friendly travel agent assistant. Help users with flights, hotels, destinations, visas, and travel planning. Keep responses concise (2-4 sentences) and use emojis occasionally. Be enthusiastic about travel!"
-                },
-                {
-                    "role": "user",
-                    "content": user_message
-                }
-            ],
+            messages=messages,
             model="llama-3.3-70b-versatile",
             temperature=0.7,
-            max_tokens=300
+            max_tokens=2000
         )
         
         bot_response = chat_completion.choices[0].message.content
+        
+        # Add bot response to history
+        conversation_history[session_id].append({"role": "assistant", "content": bot_response})
+        
         return jsonify({'response': bot_response})
     
     except Exception as e:

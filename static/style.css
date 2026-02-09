@@ -255,6 +255,20 @@ body::after {
     border-bottom-left-radius: 4px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: 1px solid #e2e8f0;
+    white-space: pre-line;
+}
+
+/* Markdown formatting in bot messages */
+.bot-message .message-content strong {
+    color: #1e40af;
+    font-size: 1.15em;
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 6px;
+}
+
+.bot-message .message-content strong:first-child {
+    margin-top: 0;
 }
 
 /* Typing indicator */

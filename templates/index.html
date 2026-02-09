@@ -57,6 +57,9 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatSection = document.querySelector('.chat-section');
         const landingSection = document.querySelector('.landing-section');
+        
+        // Generate unique session ID
+        let sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
         function openChatbot() {
             landingSection.style.display = 'none';
@@ -65,6 +68,9 @@
         }
 
         function newSession() {
+            // Generate new session ID
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
             // Clear chat window except first bot message
             chatWindow.innerHTML = `
                 <div class="message bot-message">
@@ -95,7 +101,10 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ message })
+                    body: JSON.stringify({ 
+                        message: message,
+                        session_id: sessionId 
+                    })
                 });
 
                 const data = await response.json();
@@ -118,6 +127,14 @@
         function addMessage(text, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}-message`;
+            
+            // Convert markdown to HTML for bot messages
+            if (sender === 'bot') {
+                text = text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+                    .replace(/\n/g, '<br>'); // Line breaks
+            }
+            
             messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
             chatWindow.appendChild(messageDiv);
             chatWindow.scrollTop = chatWindow.scrollHeight;
